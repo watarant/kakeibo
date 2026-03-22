@@ -234,8 +234,8 @@ async function loadData(){
       `<div class="fixed-total"><span>月合計</span><span class="fixed-total-val">${fmtYen(total)}</span></div>`;
 
     let status='green';
-    if(bank<300000||cardPct>85) status='red';
-    else if(bank<500000||budPct<40||cardPct>65) status='amber';
+    if(bank<30000||card>350000) status='red';
+    else if(bank<100000||card>270000) status='amber';
 
     ['lg','la','lr'].forEach(id=>document.getElementById(id).className='light');
     document.getElementById(status==='green'?'lg':status==='amber'?'la':'lr').className='light on-'+status;
