@@ -292,8 +292,7 @@ async function loadData(){
       fixedItems.map(i=>`
         <div class="fixed-row">
           <div>
-            ${i.name}<span class="fixed-badge">${i.kind}</span>
-            ${i.bank ? `<span class="fixed-badge">${i.bank}</span>` : ''}
+            ${i.name}${i.kind ? `<span class="fixed-badge">${i.kind}</span>` : ''}${i.bank ? `<span class="fixed-badge">${i.bank}</span>` : ''}
             ${i.memo ? `<div class="fixed-memo">${i.memo}</div>` : ''}
           </div>
           <div class="fixed-amount">${fmtYen(i.amount)}</div>
