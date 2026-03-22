@@ -27,6 +27,10 @@
   .signal-main { font-size: 20px; font-weight: 700; margin-bottom: 2px; transition: color 0.4s; }
   .signal-sub { font-size: 13px; color: var(--text2); }
   .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .metric-breakdown { display: flex; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+  .breakdown-item { flex: 1; }
+  .breakdown-label { font-size: 10px; color: var(--text3); margin-bottom: 2px; }
+  .breakdown-value { font-size: 12px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text2); }
   .metric { background: var(--surface); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); }
   .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
   .metric-value { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; }
@@ -86,7 +90,20 @@
     </div>
   </div>
   <div class="metrics">
-    <div class="metric"><div class="metric-label">純資産合計</div><div class="metric-value" id="mv-net">—</div></div>
+    <div class="metric">
+      <div class="metric-label">純資産合計</div>
+      <div class="metric-value" id="mv-net">—</div>
+      <div class="metric-breakdown">
+        <div class="breakdown-item">
+          <div class="breakdown-label">現金預金</div>
+          <div class="breakdown-value" id="mv-cash">—</div>
+        </div>
+        <div class="breakdown-item">
+          <div class="breakdown-label">証券</div>
+          <div class="breakdown-value" id="mv-inv2">—</div>
+        </div>
+      </div>
+    </div>
     <div class="metric"><div class="metric-label">生活口座</div><div class="metric-value" id="mv-bank">—</div></div>
     <div class="metric"><div class="metric-label">証券・投資</div><div class="metric-value" id="mv-inv">—</div></div>
     <div class="metric"><div class="metric-label">カード利用額</div><div class="metric-value dn" id="mv-card">—</div></div>
@@ -180,6 +197,8 @@ async function loadData(){
     const net    = bank+biz+inv-card;
 
     document.getElementById('mv-net').textContent  = fmtMan(net)+'円';
+    document.getElementById('mv-cash').textContent = fmtMan(bank+biz)+'円';
+    document.getElementById('mv-inv2').textContent = fmtMan(inv)+'円';
     document.getElementById('mv-bank').textContent = fmtMan(bank)+'円';
     document.getElementById('mv-inv').textContent  = fmtMan(inv)+'円';
     document.getElementById('mv-card').textContent = fmtMan(card)+'円';
