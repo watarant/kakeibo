@@ -210,7 +210,6 @@ async function loadData(){
 
     document.getElementById('meters-container').innerHTML = [
       {label:'生活口座残高', val:fmtMan(bank)+'円', p:bankPct, rev:false},
-      {label:'予算残り',     val:fmtMan(budRem)+'円', p:budPct, rev:false},
       {label:'カード利用',   val:fmtMan(card)+'円', p:cardPct, rev:true},
     ].map(m=>`
       <div class="meter-row">
