@@ -275,15 +275,36 @@ async function loadData(){
 
     document.getElementById('memoText').textContent = memo||'（メッセージなし）';
 
+    const bankGroups = ['UFJ','豊橋信用金庫','豊橋信金'];
+    const ufj  = fixedItems.filter(i=>i.bank==='UFJ');
+    const shinkin = fixedItems.filter(i=>i.bank==='豊橋信用金庫'||i.bank==='豊橋信金');
+    const other = fixedItems.filter(i=>i.bank!=='UFJ'&&i.bank!=='豊橋信用金庫'&&i.bank!=='豊橋信金');
+    const ufjTotal = ufj.reduce((s,i)=>s+i.amount,0);
+    const shinkinTotal = shinkin.reduce((s,i)=>s+i.amount,0);
+    const otherTotal = other.reduce((s,i)=>s+i.amount,0);
+
+    const renderRows = arr => arr.map(i=>`
+      <div class="fixed-row">
+        <div>
+          ${i.name}${i.kind ? `<span class="fixed-badge">${i.kind}</span>` : ''}
+          ${i.memo ? `<div class="fixed-memo">${i.memo}</div>` : ''}
+        </div>
+        <div class="fixed-amount">${fmtYen(i.amount)}</div>
+      </div>`).join('');
+
+    const renderSubtotal = (label, amt) =>
+      `<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:12px;font-weight:700;color:var(--text2);border-top:0.5px solid var(--border);margin-top:2px;margin-bottom:10px;">
+        <span>${label} 小計</span><span style="font-family:'DM Mono',monospace;">${fmtYen(amt)}</span>
+      </div>`;
+
+    const renderGroup = (label, arr, total) => arr.length===0 ? '' :
+      `<div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">${label}</div>`+
+      renderRows(arr)+renderSubtotal(label, total);
+
     document.getElementById('fixedList').innerHTML =
-      fixedItems.map(i=>`
-        <div class="fixed-row">
-          <div>
-            ${i.name}${i.kind ? `<span class="fixed-badge">${i.kind}</span>` : ''}${i.bank ? `<span class="fixed-badge">${i.bank}</span>` : ''}
-            ${i.memo ? `<div class="fixed-memo">${i.memo}</div>` : ''}
-          </div>
-          <div class="fixed-amount">${fmtYen(i.amount)}</div>
-        </div>`).join('')+
+      renderGroup('UFJ', ufj, ufjTotal)+
+      renderGroup('豊橋信用金庫', shinkin, shinkinTotal)+
+      (other.length ? renderGroup('その他', other, otherTotal) : '')+
       `<div class="fixed-total"><span>月合計</span><span class="fixed-total-val">${fmtYen(fixedTotal)}</span></div>`;
 
     let status='green';
