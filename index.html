@@ -168,8 +168,9 @@ async function loadData(){
       notionQuery(DB_MAIN),
       notionQuery(DB_FIXED)
     ]);
-    if(!mainRes.results.length) throw new Error('家計データが空です。Notionにデータを入力してください。');
-    const p = mainRes.results[0].properties;
+    const validRows = mainRes.results.filter(r => r.properties["生活口座"]?.number || r.properties["事業用口座"]?.number || r.properties["証券・投資"]?.number);
+    if(!validRows.length) throw new Error('家計データが空です。Notionにデータを入力してください。');
+    const p = validRows[0].properties;
     const bank   = getNum(p,'生活口座');
     const biz    = getNum(p,'事業用口座');
     const inv    = getNum(p,'証券・投資');
