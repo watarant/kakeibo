@@ -228,7 +228,7 @@ async function loadData(){
     const biz     = getNum(p,'事業用口座');
     const inv     = getNum(p,'証券・投資');
     const card1   = getNum(p,'楽天カード(Visa)');
-    const card2   = getNum(p,'楽天カード(バンダ)');
+    const card2   = getNum(p,'楽天カード(パンダ)');
     const card3   = getNum(p,'楽天カード(Pink)');
     const card    = card1+card2+card3;
     const memo    = getStr(p,'ひとこと');
@@ -246,7 +246,7 @@ async function loadData(){
     document.getElementById('mv-card2').textContent = fmtMan(card2)+'円';
     document.getElementById('mv-card3').textContent = fmtMan(card3)+'円';
     document.getElementById('card1-label').textContent = 'Visa';
-    document.getElementById('card2-label').textContent = 'バンダ';
+    document.getElementById('card2-label').textContent = 'パンダ';
     document.getElementById('card3-label').textContent = 'Pink';
 
     // UFJ必要残高の計算
@@ -255,10 +255,10 @@ async function loadData(){
       amount: getNum(r.properties,'金額'),
       kind:   getSel(r.properties,'種別'),
       memo:   getStr(r.properties,'メモ'),
-      bank:   getSel(r.properties,'引き落とし口座'),
+      bank:   getStr(r.properties,'引き落とし口座'),
     }));
     const fixedTotal   = fixedItems.reduce((s,i)=>s+i.amount,0);
-    const ufjFixed     = fixedItems.filter(i=>i.bank==='UFJ').reduce((s,i)=>s+i.amount,0);
+    const ufjFixed     = fixedItems.filter(i=>i.bank==='UFJ' || i.bank==='uFJ' || i.bank==='ufj').reduce((s,i)=>s+i.amount,0);
     const ufjNeeded    = card1+card2+ufjFixed;
     const ufjMargin    = bank-ufjNeeded;
 
