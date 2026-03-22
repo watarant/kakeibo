@@ -255,7 +255,7 @@ async function loadData(){
       amount: getNum(r.properties,'金額'),
       kind:   getSel(r.properties,'種別'),
       memo:   getStr(r.properties,'メモ'),
-      bank:   getStr(r.properties,'引き落とし口座'),
+      bank:   ((r.properties['引き落とし口座']?.multi_select?.[0]?.name) || ''),
     }));
     const fixedTotal   = fixedItems.reduce((s,i)=>s+i.amount,0);
     const ufjFixed     = fixedItems.filter(i=>i.bank==='UFJ' || i.bank==='uFJ' || i.bank==='ufj').reduce((s,i)=>s+i.amount,0);
