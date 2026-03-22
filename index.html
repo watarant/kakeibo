@@ -138,14 +138,11 @@
       <div class="metric-label">豊橋信用金庫 残高</div>
       <div class="metric-value" id="mv-biz">—</div>
     </div>
-  </div>
 
   <div id="ufj-alert"></div>
 
   <div class="card">
-    <div class="card-title">購入判断メーター</div>
-    <div id="meters-container"></div>
-    <div class="memo-label" style="margin-top:14px;">航からのひとこと</div>
+    <div class="memo-label">航からのひとこと</div>
     <div class="memo" id="memoText">読み込み中...</div>
   </div>
 
@@ -232,16 +229,18 @@ async function loadData(){
     const card3   = getNum(p,'楽天カード(Pink)');
     const card    = card1+card2+card3;
     const memo    = getStr(p,'ひとこと');
-    const bankName= getStr(p,'生活口座名') || '生活口座';
-    const bizName = getStr(p,'事業口座名') || '事業口座';
+    const bankName= '三菱UFJ';
+    const bizName = '豊橋信用金庫';
     const net     = bank+biz+inv-card;
 
     document.getElementById('mv-net').textContent   = fmtMan(net)+'円';
     document.getElementById('mv-cash').textContent  = fmtMan(bank+biz)+'円';
     document.getElementById('mv-inv2').textContent  = fmtMan(inv)+'円';
+    
+    
+    document.getElementById('mv-card').textContent  = fmtMan(card)+'円';
     document.getElementById('mv-bank').textContent  = fmtMan(bank)+'円';
     document.getElementById('mv-biz').textContent   = fmtMan(biz)+'円';
-    document.getElementById('mv-card').textContent  = fmtMan(card)+'円';
     document.getElementById('mv-card1').textContent = fmtMan(card1)+'円';
     document.getElementById('mv-card2').textContent = fmtMan(card2)+'円';
     document.getElementById('mv-card3').textContent = fmtMan(card3)+'円';
@@ -274,19 +273,6 @@ async function loadData(){
     document.getElementById('ufj-alert').innerHTML=alertHtml;
 
     document.getElementById('memoText').textContent = memo||'（メッセージなし）';
-
-    const bankPct = pct(bank, Math.max(bank*2,500000));
-    const cardPct = pct(card, 350000);
-
-    document.getElementById('meters-container').innerHTML = [
-      {label:'UFJ残高', val:fmtMan(bank)+'円', p:bankPct, rev:false},
-      {label:'カード合計', val:fmtMan(card)+'円', p:cardPct, rev:true},
-    ].map(m=>`
-      <div class="meter-row">
-        <div class="meter-label">${m.label}</div>
-        <div class="meter-track"><div class="meter-fill" style="width:${m.p}%;background:${barColor(m.p,m.rev)};"></div></div>
-        <div class="meter-val">${m.val}</div>
-      </div>`).join('');
 
     document.getElementById('fixedList').innerHTML =
       fixedItems.map(i=>`
