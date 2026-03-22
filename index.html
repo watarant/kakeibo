@@ -14,11 +14,8 @@
     --text2: #6B6760;
     --text3: #A09D98;
     --green: #2D6A4F;
-    --green-bg: #D8F3DC;
     --amber: #B5450B;
-    --amber-bg: #FFE8D6;
     --red: #9B1D1D;
-    --red-bg: #FFE0E0;
     --border: rgba(0,0,0,0.08);
     --radius: 12px;
   }
@@ -29,24 +26,13 @@
     color: var(--text);
     min-height: 100vh;
     padding: 24px 16px 48px;
+    max-width: 600px;
+    margin: 0 auto;
   }
-  .header {
-    text-align: center;
-    margin-bottom: 28px;
-  }
-  .header h1 {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    margin-bottom: 4px;
-  }
-  .header .date {
-    font-size: 12px;
-    color: var(--text3);
-    font-family: 'DM Mono', monospace;
-  }
+  .header { text-align: center; margin-bottom: 28px; }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .header .date { font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace; }
 
-  /* 信号機バナー */
   .signal {
     background: var(--surface);
     border-radius: var(--radius);
@@ -56,250 +42,53 @@
     gap: 16px;
     margin-bottom: 16px;
     border: 1px solid var(--border);
-    transition: all 0.4s ease;
   }
-  .lights {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .light {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: var(--surface2);
-    transition: all 0.4s ease;
-  }
+  .lights { display: flex; flex-direction: column; gap: 6px; }
+  .light { width: 18px; height: 18px; border-radius: 50%; background: var(--surface2); transition: all 0.4s; }
   .light.on-green { background: #2D6A4F; box-shadow: 0 0 8px rgba(45,106,79,0.4); }
   .light.on-amber { background: #E07B39; box-shadow: 0 0 8px rgba(224,123,57,0.4); }
   .light.on-red   { background: #C0392B; box-shadow: 0 0 8px rgba(192,57,43,0.4); }
   .signal-text { flex: 1; }
-  .signal-main {
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 2px;
-    transition: color 0.4s;
-  }
+  .signal-main { font-size: 20px; font-weight: 700; margin-bottom: 2px; transition: color 0.4s; }
   .signal-sub { font-size: 13px; color: var(--text2); }
 
-  /* メトリクス */
-  .metrics {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .metric {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 16px;
-    border: 1px solid var(--border);
-  }
-  .metric-label {
-    font-size: 11px;
-    color: var(--text3);
-    margin-bottom: 6px;
-    letter-spacing: 0.03em;
-  }
-  .metric-value {
-    font-size: 18px;
-    font-weight: 700;
-    font-family: 'DM Mono', monospace;
-    letter-spacing: -0.02em;
-  }
-  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
-  .up { color: var(--green); }
+  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .metric { background: var(--surface); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); }
+  .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; }
+  .metric-value { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; }
   .dn { color: var(--red); }
 
-  /* メーターカード */
-  .card {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 18px;
-    margin-bottom: 12px;
-    border: 1px solid var(--border);
-  }
-  .card-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text3);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 14px;
-  }
-  .meter-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
+  .card { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; border: 1px solid var(--border); }
+  .card-title { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+
+  .meter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
   .meter-row:last-child { margin-bottom: 0; }
   .meter-label { font-size: 12px; color: var(--text2); width: 80px; flex-shrink: 0; }
-  .meter-track {
-    flex: 1;
-    height: 6px;
-    background: var(--surface2);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  .meter-fill {
-    height: 6px;
-    border-radius: 3px;
-    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  .meter-val {
-    font-size: 12px;
-    font-family: 'DM Mono', monospace;
-    font-weight: 500;
-    width: 54px;
-    text-align: right;
-    flex-shrink: 0;
-  }
+  .meter-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+  .meter-fill { height: 6px; border-radius: 3px; transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
+  .meter-val { font-size: 12px; font-family: 'DM Mono', monospace; font-weight: 500; width: 54px; text-align: right; flex-shrink: 0; }
 
-  /* 固定費 */
-  .fixed-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-  }
+  .fixed-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
   .fixed-row:last-child { border-bottom: none; }
-  .fixed-name { color: var(--text); }
-  .fixed-badge {
-    font-size: 10px;
-    padding: 2px 7px;
-    border-radius: 20px;
-    margin-left: 6px;
-    font-weight: 500;
-  }
-  .fixed-amount {
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    color: var(--text2);
-  }
-  .fixed-total {
-    display: flex;
-    justify-content: space-between;
-    padding-top: 10px;
-    margin-top: 2px;
-    font-weight: 700;
-    font-size: 13px;
-    border-top: 1px solid var(--text);
-  }
-  .fixed-total-val {
-    font-family: 'DM Mono', monospace;
-    color: var(--red);
-  }
+  .fixed-badge { font-size: 10px; padding: 2px 7px; border-radius: 20px; margin-left: 6px; font-weight: 500; background: var(--surface2); color: var(--text2); }
+  .fixed-amount { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text2); }
+  .fixed-total { display: flex; justify-content: space-between; padding-top: 10px; margin-top: 2px; font-weight: 700; font-size: 13px; border-top: 1px solid var(--text); }
+  .fixed-total-val { font-family: 'DM Mono', monospace; color: var(--red); }
 
-  /* メモ */
-  .memo {
-    background: var(--surface2);
-    border-radius: 8px;
-    padding: 12px 14px;
-    font-size: 13px;
-    color: var(--text);
-    line-height: 1.7;
-    margin-top: 12px;
-  }
-  .memo-label {
-    font-size: 11px;
-    color: var(--text3);
-    margin-bottom: 4px;
-    letter-spacing: 0.04em;
-  }
+  .memo { background: var(--surface2); border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.7; margin-top: 8px; }
+  .memo-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
 
-  /* ローディング */
-  .loading {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text3);
-    font-size: 14px;
-  }
-  .loading-dot {
-    display: inline-block;
-    animation: blink 1.2s ease-in-out infinite;
-  }
-  .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-  .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes blink { 0%,80%,100%{opacity:0.2} 40%{opacity:1} }
+  .error-box { background: #FFE0E0; border-radius: 8px; padding: 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; line-height: 1.6; }
 
-  .error-box {
-    background: var(--red-bg);
-    border-radius: 8px;
-    padding: 14px;
-    font-size: 13px;
-    color: var(--red);
-    margin-bottom: 12px;
-    line-height: 1.6;
-  }
-
-  /* スキップバッジ */
-  .badge-家賃 { background: #E8F4FD; color: #1A6FAE; }
-  .badge-教育ローン { background: #EDE7F6; color: #512DA8; }
-  .badge-奨学金 { background: #EDE7F6; color: #512DA8; }
-  .badge-定期積金 { background: #E8F5E9; color: #2E7D32; }
-  .badge-分割購入 { background: #FFF8E1; color: #F57F17; }
-  .badge-生命保険 { background: #FCE4EC; color: #C62828; }
-  .badge-default { background: var(--surface2); color: var(--text2); }
-
-  .refresh-btn {
-    display: block;
-    width: 100%;
-    margin-top: 20px;
-    padding: 13px;
-    background: var(--text);
-    color: var(--bg);
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'Zen Kaku Gothic New', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: 0.04em;
-    transition: opacity 0.2s;
-  }
-  .refresh-btn:hover { opacity: 0.8; }
-
-  /* API設定パネル */
-  .settings {
-    background: var(--surface);
-    border-radius: var(--radius);
-    padding: 18px;
-    margin-bottom: 16px;
-    border: 1px solid var(--border);
-  }
-  .settings input {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 13px;
-    font-family: 'DM Mono', monospace;
-    background: var(--surface2);
-    color: var(--text);
-    margin-top: 6px;
-    margin-bottom: 12px;
-  }
-  .settings label { font-size: 12px; color: var(--text2); }
-  .settings-title {
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 14px;
-    color: var(--text);
-  }
-  .save-btn {
-    padding: 10px 20px;
-    background: var(--text);
-    color: var(--bg);
-    border: none;
-    border-radius: 8px;
-    font-family: 'Zen Kaku Gothic New', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    cursor: pointer;
-  }
+  .settings { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; border: 1px solid var(--border); }
+  .settings-title { font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+  .settings label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; }
+  .settings input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'DM Mono', monospace; background: var(--surface2); color: var(--text); margin-bottom: 12px; }
+  .save-btn { padding: 10px 20px; background: var(--text); color: var(--bg); border: none; border-radius: 8px; font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
   .note { font-size: 11px; color: var(--text3); margin-top: 8px; line-height: 1.5; }
+  .refresh-btn { display: block; width: 100%; margin-top: 20px; padding: 13px; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .refresh-btn:hover { opacity: 0.8; }
+  .settings-link { text-align: center; margin-top: 12px; font-size: 11px; color: var(--text3); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -309,16 +98,16 @@
   <div class="date" id="dateStr"></div>
 </div>
 
-<div id="settingsPanel" class="settings">
-  <div class="settings-title">初期設定 — Notion APIキーを入力</div>
+<div id="settingsPanel" class="settings" style="display:none;">
+  <div class="settings-title">Notion APIキーを入力</div>
   <label>シークレットキー（secret_xxx...）</label>
   <input type="password" id="apiKey" placeholder="secret_xxxxxxxxxx">
   <button class="save-btn" onclick="saveAndLoad()">保存して読み込む</button>
-  <div class="note">キーはこのブラウザにのみ保存されます。外部には送信されません。</div>
+  <div class="note">キーはこのブラウザにのみ保存されます。外部サーバーには送信されません。</div>
 </div>
 
 <div id="mainContent" style="display:none;">
-  <div id="signalBanner" class="signal">
+  <div class="signal">
     <div class="lights">
       <div class="light" id="lg"></div>
       <div class="light" id="la"></div>
@@ -331,144 +120,112 @@
   </div>
 
   <div class="metrics">
-    <div class="metric">
-      <div class="metric-label">純資産合計</div>
-      <div class="metric-value" id="mv-net">—</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">生活口座</div>
-      <div class="metric-value" id="mv-bank">—</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">証券・投資</div>
-      <div class="metric-value" id="mv-inv">—</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">カード利用額</div>
-      <div class="metric-value dn" id="mv-card">—</div>
-    </div>
+    <div class="metric"><div class="metric-label">純資産合計</div><div class="metric-value" id="mv-net">—</div></div>
+    <div class="metric"><div class="metric-label">生活口座</div><div class="metric-value" id="mv-bank">—</div></div>
+    <div class="metric"><div class="metric-label">証券・投資</div><div class="metric-value" id="mv-inv">—</div></div>
+    <div class="metric"><div class="metric-label">カード利用額</div><div class="metric-value dn" id="mv-card">—</div></div>
   </div>
 
   <div class="card">
     <div class="card-title">購入判断メーター</div>
-    <div id="meters-container">
-      <div class="loading">読み込み中<span class="loading-dot">.</span><span class="loading-dot">.</span><span class="loading-dot">.</span></div>
-    </div>
+    <div id="meters-container"></div>
     <div class="memo-label" style="margin-top:14px;">航からのひとこと</div>
     <div class="memo" id="memoText">読み込み中...</div>
   </div>
 
   <div class="card">
     <div class="card-title">今月の固定費</div>
-    <div id="fixedList">
-      <div class="loading">読み込み中<span class="loading-dot">.</span><span class="loading-dot">.</span><span class="loading-dot">.</span></div>
-    </div>
+    <div id="fixedList"></div>
   </div>
 
   <button class="refresh-btn" onclick="loadData()">最新データに更新</button>
-  <div style="text-align:center; margin-top:12px;">
-    <span style="font-size:11px; color:var(--text3); cursor:pointer;" onclick="showSettings()">設定を変更</span>
-  </div>
+  <div class="settings-link" onclick="showSettings()">設定を変更</div>
 </div>
 
 <script>
-const DB_MAIN   = '32b75f4c7ff980dc9148e8dd1ed396ac';
-const DB_FIXED  = '32b75f4c7ff98094bdc6fcb9ef365e02';
-const PROXY     = 'https://notion-proxy.vercel.app/api/notion';
+const DB_MAIN  = '32b75f4c7ff980dc9148e8dd1ed396ac';
+const DB_FIXED = '32b75f4c7ff98094bdc6fcb9ef365e02';
 
 const d = new Date();
 document.getElementById('dateStr').textContent =
   d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 時点';
 
-function getKey(){ return localStorage.getItem('notion_key') || ''; }
+function getKey(){ return localStorage.getItem('notion_key')||''; }
 
 function saveAndLoad(){
   const k = document.getElementById('apiKey').value.trim();
   if(!k.startsWith('secret_')){ alert('シークレットキーは secret_ で始まります'); return; }
   localStorage.setItem('notion_key', k);
-  document.getElementById('settingsPanel').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('settingsPanel').style.display='none';
+  document.getElementById('mainContent').style.display='block';
   loadData();
 }
 
 function showSettings(){
-  document.getElementById('settingsPanel').style.display = 'block';
-  document.getElementById('apiKey').value = getKey();
+  document.getElementById('settingsPanel').style.display='block';
+  document.getElementById('apiKey').value=getKey();
 }
 
 async function notionQuery(dbId){
   const key = getKey();
-  const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent('https://api.notion.com/v1/databases/'+dbId+'/query')}`, {
+  // Notionfly CORSプロキシを使用
+  const url = 'https://notion-cors-proxy.onrender.com/v1/databases/'+dbId+'/query';
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       'Authorization': 'Bearer '+key,
       'Notion-Version': '2022-06-28',
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ page_size: 50 })
+    body: JSON.stringify({ page_size: 50, sorts:[{timestamp:'created_time',direction:'descending'}] })
   });
-  if(!res.ok) throw new Error('API Error: '+res.status);
+  if(!res.ok){
+    const txt = await res.text();
+    throw new Error('APIエラー '+res.status+': '+txt.slice(0,100));
+  }
   return res.json();
 }
 
-function getNum(props, key){ return props[key]?.number ?? 0; }
-function getStr(props, key){ return props[key]?.rich_text?.[0]?.plain_text ?? props[key]?.title?.[0]?.plain_text ?? ''; }
-function getSel(props, key){ return props[key]?.select?.name ?? ''; }
-function fmtMan(yen){ return Math.round(yen/10000*10)/10+'万'; }
-function fmtYen(yen){ return yen.toLocaleString('ja-JP')+'円'; }
-function pct(v,mx){ return Math.min(100, Math.round(v/mx*100)); }
+function getNum(p,k){ return p[k]?.number??0; }
+function getStr(p,k){ return p[k]?.rich_text?.[0]?.plain_text??p[k]?.title?.[0]?.plain_text??''; }
+function getSel(p,k){ return p[k]?.select?.name??''; }
+function fmtMan(y){ return (Math.round(y/1000)/10).toFixed(1)+'万'; }
+function fmtYen(y){ return Math.round(y).toLocaleString('ja-JP')+'円'; }
+function pct(v,mx){ return Math.min(100,Math.round(v/mx*100)); }
+function barColor(p,rev){
+  if(rev) return p>85?'#C0392B':p>65?'#E07B39':'#2D6A4F';
+  return p<30?'#C0392B':p<50?'#E07B39':'#2D6A4F';
+}
 
 async function loadData(){
-  const key = getKey();
-  if(!key){ showSettings(); return; }
-
+  document.getElementById('sigMain').textContent='読み込み中...';
+  document.getElementById('sigMain').style.color='';
   try {
     const [mainRes, fixedRes] = await Promise.all([
       notionQuery(DB_MAIN),
       notionQuery(DB_FIXED)
     ]);
 
-    // 最新行を取得
-    const rows = mainRes.results;
-    if(!rows.length){ throw new Error('家計データが空です。Notionにデータを入力してください。'); }
-    const latest = rows[0].properties;
+    if(!mainRes.results.length) throw new Error('家計データが空です。Notionにデータを入力してください。');
+    const p = mainRes.results[0].properties;
 
-    const bank    = getNum(latest, '生活口座');
-    const biz     = getNum(latest, '事業用口座');
-    const inv     = getNum(latest, '証券・投資');
-    const card    = getNum(latest, 'カード利用額');
-    const budRem  = getNum(latest, '月予算残り');
-    const memo    = getStr(latest, 'ひとこと');
+    const bank   = getNum(p,'生活口座');
+    const biz    = getNum(p,'事業用口座');
+    const inv    = getNum(p,'証券・投資');
+    const card   = getNum(p,'カード利用額');
+    const budRem = getNum(p,'月予算残り');
+    const memo   = getStr(p,'ひとこと');
+    const net    = bank+biz+inv-card;
 
-    // 固定費合計
-    const fixedItems = fixedRes.results.map(r => ({
-      name:   getStr(r.properties, '項目名'),
-      amount: getNum(r.properties, '金額'),
-      kind:   getSel(r.properties, '種別'),
-      day:    getNum(r.properties, '引き落とし日'),
-    }));
-    const fixedTotal = fixedItems.reduce((s,i)=>s+i.amount, 0);
-
-    const net = bank + biz + inv - card;
-
-    // 数値カード
     document.getElementById('mv-net').textContent  = fmtMan(net)+'円';
     document.getElementById('mv-bank').textContent = fmtMan(bank)+'円';
     document.getElementById('mv-inv').textContent  = fmtMan(inv)+'円';
     document.getElementById('mv-card').textContent = fmtMan(card)+'円';
+    document.getElementById('memoText').textContent = memo||'（メッセージなし）';
 
-    // メーター
-    const bankMax  = Math.max(bank * 2, 500000);
-    const budMax   = budRem > 0 ? budRem * 3 : 200000;
-    const cardMax  = 150000;
-    const bankPct  = pct(bank, bankMax);
-    const budPct   = pct(budRem, budMax > 0 ? budMax : 1);
-    const cardPct  = pct(card, cardMax);
-
-    const barColor = (p, rev) => {
-      if(rev) return p>85?'#C0392B':p>65?'#E07B39':'#2D6A4F';
-      return p<30?'#C0392B':p<50?'#E07B39':'#2D6A4F';
-    };
+    const bankPct = pct(bank, Math.max(bank*2, 500000));
+    const budPct  = budRem>0 ? pct(budRem, budRem*3) : 0;
+    const cardPct = pct(card, 150000);
 
     document.getElementById('meters-container').innerHTML = [
       {label:'生活口座残高', val:fmtMan(bank)+'円', p:bankPct, rev:false},
@@ -481,54 +238,51 @@ async function loadData(){
         <div class="meter-val">${m.val}</div>
       </div>`).join('');
 
-    // メモ
-    document.getElementById('memoText').textContent = memo || '（メッセージなし）';
-
-    // 固定費リスト
-    const badgeClass = k => {
-      const map = {'家賃':'badge-家賃','教育ローン':'badge-教育ローン','奨学金':'badge-奨学金','定期積金':'badge-定期積金','分割購入':'badge-分割購入','生命保険':'badge-生命保険'};
-      return map[k] || 'badge-default';
-    };
+    const items = fixedRes.results.map(r=>({
+      name:   getStr(r.properties,'項目名'),
+      amount: getNum(r.properties,'金額'),
+      kind:   getSel(r.properties,'種別'),
+    }));
+    const total = items.reduce((s,i)=>s+i.amount,0);
     document.getElementById('fixedList').innerHTML =
-      fixedItems.map(i=>`
+      items.map(i=>`
         <div class="fixed-row">
-          <div class="fixed-name">${i.name}<span class="fixed-badge ${badgeClass(i.kind)}">${i.kind}</span></div>
+          <div>${i.name}<span class="fixed-badge">${i.kind}</span></div>
           <div class="fixed-amount">${fmtYen(i.amount)}</div>
-        </div>`).join('') +
-      `<div class="fixed-total"><span>月合計</span><span class="fixed-total-val">${fmtYen(fixedTotal)}</span></div>`;
+        </div>`).join('')+
+      `<div class="fixed-total"><span>月合計</span><span class="fixed-total-val">${fmtYen(total)}</span></div>`;
 
-    // 信号機
-    let status = 'green';
-    if(bank < 300000 || budPct < 20 || cardPct > 85) status = 'red';
-    else if(bank < 500000 || budPct < 40 || cardPct > 65) status = 'amber';
+    let status='green';
+    if(bank<300000||cardPct>85) status='red';
+    else if(bank<500000||budPct<40||cardPct>65) status='amber';
 
-    document.getElementById('lg').className = 'light' + (status==='green' ? ' on-green' : '');
-    document.getElementById('la').className = 'light' + (status==='amber' ? ' on-amber' : '');
-    document.getElementById('lr').className = 'light' + (status==='red'   ? ' on-red'   : '');
+    ['lg','la','lr'].forEach(id=>document.getElementById(id).className='light');
+    document.getElementById(status==='green'?'lg':status==='amber'?'la':'lr').className=
+      'light on-'+status;
 
-    const msgs = {
-      green: ['買って大丈夫！', '余裕あり。気軽に使ってOK'],
-      amber: ['ちょっと確認して', '大きな出費は相談してね'],
-      red:   ['今月は控えめに', '航に聞いてから買おう']
+    const msgs={
+      green:['買って大丈夫！','余裕あり。気軽に使ってOK'],
+      amber:['ちょっと確認して','大きな出費は相談してね'],
+      red:  ['今月は控えめに','航に聞いてから買おう']
     };
-    const sigEl = document.getElementById('sigMain');
-    sigEl.textContent = msgs[status][0];
-    sigEl.style.color = status==='green'?'#2D6A4F':status==='amber'?'#B5450B':'#9B1D1D';
-    document.getElementById('sigSub').textContent = msgs[status][1];
+    const el=document.getElementById('sigMain');
+    el.textContent=msgs[status][0];
+    el.style.color=status==='green'?'#2D6A4F':status==='amber'?'#B5450B':'#9B1D1D';
+    document.getElementById('sigSub').textContent=msgs[status][1];
 
-  } catch(e) {
-    document.getElementById('meters-container').innerHTML =
-      `<div class="error-box">データの読み込みに失敗しました。<br>${e.message}<br><br>Notionのページにインテグレーションが接続されているか確認してください。</div>`;
+  } catch(e){
+    document.getElementById('meters-container').innerHTML=
+      `<div class="error-box">読み込み失敗: ${e.message}</div>`;
+    document.getElementById('sigMain').textContent='エラー';
   }
 }
 
-// 起動時
+// 起動
 if(getKey()){
-  document.getElementById('settingsPanel').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
+  document.getElementById('mainContent').style.display='block';
   loadData();
 } else {
-  document.getElementById('settingsPanel').style.display = 'block';
+  document.getElementById('settingsPanel').style.display='block';
 }
 </script>
 </body>
