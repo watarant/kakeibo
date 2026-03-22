@@ -117,7 +117,7 @@ function getKey(){ return localStorage.getItem('notion_key')||''; }
 
 function saveAndLoad(){
   const k = document.getElementById('apiKey').value.trim();
-  if(!k.startsWith('secret_')){ alert('シークレットキーは secret_ で始まります'); return; }
+  if(!k.startsWith('secret_') && !k.startsWith('ntn_')){ alert('シークレットキーは secret_ で始まります'); return; }
   localStorage.setItem('notion_key', k);
   document.getElementById('settingsPanel').style.display='none';
   document.getElementById('mainContent').style.display='block';
