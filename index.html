@@ -249,6 +249,32 @@ async function loadData(){
     document.getElementById('card2-label').textContent = 'パンダ';
     document.getElementById('card3-label').textContent = 'Pink';
 
+    // 祝日取得
+    let holidays = new Set();
+    try {
+      const yr = new Date().getFullYear();
+      const hRes = await fetch(`https://holidays-jp.github.io/api/v1/${yr}/date.json`);
+      if(hRes.ok){ const hData = await hRes.json(); holidays = new Set(Object.keys(hData)); }
+    } catch(e){}
+
+    const today = new Date();
+    const todayY = today.getFullYear();
+    const todayM = today.getMonth();
+    const todayD = today.getDate();
+    const todayDate = new Date(todayY, todayM, todayD);
+
+    // 実際の引き落とし日を計算（土日祝→前の平日）
+    function actualDebitDate(year, month, day){
+      const lastDay = new Date(year, month+1, 0).getDate();
+      const d = day===31 ? lastDay : Math.min(day, lastDay);
+      let dt = new Date(year, month, d);
+      while(dt.getDay()===0 || dt.getDay()===6 ||
+            holidays.has(dt.toISOString().slice(0,10))){
+        dt.setDate(dt.getDate()-1);
+      }
+      return dt;
+    }
+
     // UFJ必要残高の計算
     const fixedItems = fixedRes.results.map(r=>({
       name:   getStr(r.properties,'項目名'),
@@ -256,20 +282,40 @@ async function loadData(){
       kind:   getSel(r.properties,'種別'),
       memo:   getStr(r.properties,'メモ'),
       bank:   ((r.properties['引き落とし口座']?.multi_select?.[0]?.name) || ''),
+      day:    getNum(r.properties,'引き落とし日'),
     }));
-    const fixedTotal   = fixedItems.reduce((s,i)=>s+i.amount,0);
-    const ufjFixed     = fixedItems.filter(i=>i.bank==='UFJ' || i.bank==='uFJ' || i.bank==='ufj').reduce((s,i)=>s+i.amount,0);
-    const ufjNeeded    = card1+card2+ufjFixed;
-    const ufjMargin    = bank-ufjNeeded;
 
-    // UFJアラート
+    // 各固定費の引き落とし済み判定
+    fixedItems.forEach(item => {
+      const ad = actualDebitDate(todayY, todayM, item.day||1);
+      item.actualDay = ad.getDate();
+      item.debited = ad <= todayDate;
+    });
+
+    const fixedTotal = fixedItems.reduce((s,i)=>s+i.amount,0);
+
+    // カード（Visa・パンダ）の引き落とし日は27日として判定
+    const cardDebitDate = actualDebitDate(todayY, todayM, 27);
+    const cardsDebited = cardDebitDate <= todayDate;
+
+    const ufjFixedRemaining = fixedItems
+      .filter(i=>i.bank==='UFJ' && !i.debited)
+      .reduce((s,i)=>s+i.amount, 0);
+    const ufjCardRemaining = cardsDebited ? 0 : (card1+card2);
+    const ufjNeeded  = ufjFixedRemaining + ufjCardRemaining;
+    const ufjMargin  = bank - ufjNeeded;
+    const ufjFixed   = fixedItems.filter(i=>i.bank==='UFJ').reduce((s,i)=>s+i.amount,0);
+
+    const mm = todayM+1;
     let alertHtml='';
-    if(ufjMargin<0){
-      alertHtml=`<div class="alert-box alert-red"><div class="alert-label">UFJ 残高不足</div>引き落とし必要額 ${fmtMan(ufjNeeded)}円 に対して ${fmtMan(Math.abs(ufjMargin))}円 不足しています</div>`;
+    if(ufjNeeded===0){
+      alertHtml=`<div class="alert-box alert-green"><div class="alert-label">UFJ 今月の引き落とし完了</div>${mm}月分の引き落としはすべて完了しています</div>`;
+    } else if(ufjMargin<0){
+      alertHtml=`<div class="alert-box alert-red"><div class="alert-label">UFJ 残高不足</div>残り引き落とし ${fmtMan(ufjNeeded)}円 に対して ${fmtMan(Math.abs(ufjMargin))}円 不足しています</div>`;
     } else if(ufjMargin<50000){
-      alertHtml=`<div class="alert-box alert-amber"><div class="alert-label">UFJ 残高が少なめ</div>引き落とし後の余裕は ${fmtMan(ufjMargin)}円 です</div>`;
+      alertHtml=`<div class="alert-box alert-amber"><div class="alert-label">UFJ 残高が少なめ</div>残り引き落とし ${fmtMan(ufjNeeded)}円 を差し引くと余裕 ${fmtMan(ufjMargin)}円 です</div>`;
     } else {
-      alertHtml=`<div class="alert-box alert-green"><div class="alert-label">UFJ 残高OK</div>引き落とし後も ${fmtMan(ufjMargin)}円 の余裕があります</div>`;
+      alertHtml=`<div class="alert-box alert-green"><div class="alert-label">UFJ 残高OK</div>残り引き落とし ${fmtMan(ufjNeeded)}円 を差し引いても ${fmtMan(ufjMargin)}円 の余裕があります</div>`;
     }
     document.getElementById('ufj-alert').innerHTML=alertHtml;
 
@@ -284,9 +330,10 @@ async function loadData(){
     const otherTotal = other.reduce((s,i)=>s+i.amount,0);
 
     const renderRows = arr => arr.map(i=>`
-      <div class="fixed-row">
+      <div class="fixed-row" style="${i.debited ? 'opacity:0.45;' : ''}">
         <div>
           ${i.name}${i.kind ? `<span class="fixed-badge">${i.kind}</span>` : ''}
+          ${i.debited ? `<span class="fixed-badge" style="background:#D8F3DC;color:#1B4332;">済</span>` : `<span class="fixed-badge" style="background:#FFF3CD;color:#7D4E00;">${i.actualDay}日</span>`}
           ${i.memo ? `<div class="fixed-memo">${i.memo}</div>` : ''}
         </div>
         <div class="fixed-amount">${fmtYen(i.amount)}</div>
