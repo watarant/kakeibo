@@ -6,68 +6,56 @@
 <title>家計ダッシュボード</title>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #F5F3EF; --surface: #FFFFFF; --surface2: #F0EDE8;
-    --text: #1C1A17; --text2: #6B6760; --text3: #A09D98;
-    --green: #2D6A4F; --amber: #B5450B; --red: #9B1D1D;
-    --border: rgba(0,0,0,0.08); --radius: 12px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Zen Kaku Gothic New', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 24px 16px 48px; max-width: 600px; margin: 0 auto; }
-  .header { text-align: center; margin-bottom: 28px; }
-  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 4px; }
-  .header .date { font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace; }
-  .signal { background: var(--surface); border-radius: var(--radius); padding: 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
-  .lights { display: flex; flex-direction: column; gap: 6px; }
-  .light { width: 18px; height: 18px; border-radius: 50%; background: var(--surface2); transition: all 0.4s; }
-  .light.on-green { background: #2D6A4F; box-shadow: 0 0 8px rgba(45,106,79,0.4); }
-  .light.on-amber { background: #E07B39; box-shadow: 0 0 8px rgba(224,123,57,0.4); }
-  .light.on-red { background: #C0392B; box-shadow: 0 0 8px rgba(192,57,43,0.4); }
-  .signal-text { flex: 1; }
-  .signal-main { font-size: 20px; font-weight: 700; margin-bottom: 2px; transition: color 0.4s; }
-  .signal-sub { font-size: 13px; color: var(--text2); }
-  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-  .metric { background: var(--surface); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); }
-  .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
-  .metric-value { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; }
-  .metric-name { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
-  .metric-breakdown { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
-  .breakdown-item { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
-  .breakdown-label { font-size: 11px; color: var(--text3); }
-  .breakdown-value { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); }
-  .dn { color: var(--red); }
-  .card { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; border: 1px solid var(--border); }
-  .card-title { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
-  .meter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-  .meter-row:last-child { margin-bottom: 0; }
-  .meter-label { font-size: 12px; color: var(--text2); width: 80px; flex-shrink: 0; }
-  .meter-track { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-  .meter-fill { height: 6px; border-radius: 3px; transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1); }
-  .meter-val { font-size: 12px; font-family: 'DM Mono', monospace; font-weight: 500; width: 54px; text-align: right; flex-shrink: 0; }
-  .alert-box { border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; }
-  .alert-green { background: #D8F3DC; color: #1B4332; }
-  .alert-amber { background: #FFF3CD; color: #7D4E00; }
-  .alert-red { background: #FFE0E0; color: var(--red); }
-  .alert-label { font-size: 11px; font-weight: 700; margin-bottom: 2px; letter-spacing: 0.04em; }
-  .fixed-row { display: flex; align-items: flex-start; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
-  .fixed-row:last-child { border-bottom: none; }
-  .fixed-badge { font-size: 10px; padding: 2px 7px; border-radius: 20px; margin-left: 6px; font-weight: 500; background: var(--surface2); color: var(--text2); }
-  .fixed-memo { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .fixed-amount { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text2); white-space: nowrap; margin-left: 8px; }
-  .fixed-total { display: flex; justify-content: space-between; padding-top: 10px; margin-top: 2px; font-weight: 700; font-size: 13px; border-top: 1px solid var(--text); }
-  .fixed-total-val { font-family: 'DM Mono', monospace; color: var(--red); }
-  .memo { background: var(--surface2); border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.7; margin-top: 8px; }
-  .memo-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
-  .error-box { background: #FFE0E0; border-radius: 8px; padding: 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; line-height: 1.6; }
-  .settings { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; border: 1px solid var(--border); }
-  .settings-title { font-size: 13px; font-weight: 700; margin-bottom: 14px; }
-  .settings label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; }
-  .settings input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'DM Mono', monospace; background: var(--surface2); color: var(--text); margin-bottom: 12px; }
-  .save-btn { padding: 10px 20px; background: var(--text); color: var(--bg); border: none; border-radius: 8px; font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
-  .note { font-size: 11px; color: var(--text3); margin-top: 8px; line-height: 1.5; }
-  .refresh-btn { display: block; width: 100%; margin-top: 12px; padding: 13px; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
-  .refresh-btn:hover { opacity: 0.8; }
-  .settings-link { text-align: center; margin-top: 12px; font-size: 11px; color: var(--text3); cursor: pointer; }
+:root { --bg: #F5F3EF; --surface: #FFFFFF; --surface2: #F0EDE8; --text: #1C1A17; --text2: #6B6760; --text3: #A09D98; --green: #2D6A4F; --amber: #B5450B; --red: #9B1D1D; --border: rgba(0,0,0,0.08); --radius: 12px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Zen Kaku Gothic New', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 24px 16px 48px; max-width: 600px; margin: 0 auto; }
+.header { text-align: center; margin-bottom: 28px; }
+.header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 4px; }
+.header .date { font-size: 12px; color: var(--text3); font-family: 'DM Mono', monospace; }
+.signal { background: var(--surface); border-radius: var(--radius); padding: 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; border: 1px solid var(--border); }
+.lights { display: flex; flex-direction: column; gap: 6px; }
+.light { width: 18px; height: 18px; border-radius: 50%; background: var(--surface2); transition: all 0.4s; }
+.light.on-green { background: #2D6A4F; box-shadow: 0 0 8px rgba(45,106,79,0.4); }
+.light.on-amber { background: #E07B39; box-shadow: 0 0 8px rgba(224,123,57,0.4); }
+.light.on-red { background: #C0392B; box-shadow: 0 0 8px rgba(192,57,43,0.4); }
+.signal-text { flex: 1; }
+.signal-main { font-size: 20px; font-weight: 700; margin-bottom: 2px; transition: color 0.4s; }
+.signal-sub { font-size: 13px; color: var(--text2); }
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.metric { background: var(--surface); border-radius: var(--radius); padding: 16px; border: 1px solid var(--border); }
+.metric-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.metric-value { font-size: 18px; font-weight: 700; font-family: 'DM Mono', monospace; }
+.metric-breakdown { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.breakdown-item { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 3px; }
+.breakdown-label { font-size: 11px; color: var(--text3); }
+.breakdown-value { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); }
+.dn { color: var(--red); }
+.card { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; border: 1px solid var(--border); }
+.card-title { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 14px; }
+.alert-box { border-radius: 8px; padding: 12px 14px; margin-bottom: 12px; font-size: 13px; line-height: 1.6; }
+.alert-green { background: #D8F3DC; color: #1B4332; }
+.alert-amber { background: #FFF3CD; color: #7D4E00; }
+.alert-red { background: #FFE0E0; color: var(--red); }
+.alert-label { font-size: 11px; font-weight: 700; margin-bottom: 2px; letter-spacing: 0.04em; }
+.fixed-row { display: flex; align-items: flex-start; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.fixed-row:last-child { border-bottom: none; }
+.fixed-badge { font-size: 10px; padding: 2px 7px; border-radius: 20px; margin-left: 6px; font-weight: 500; background: var(--surface2); color: var(--text2); }
+.fixed-memo { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.fixed-amount { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text2); white-space: nowrap; margin-left: 8px; }
+.fixed-total { display: flex; justify-content: space-between; padding-top: 10px; margin-top: 2px; font-weight: 700; font-size: 13px; border-top: 1px solid var(--text); }
+.fixed-total-val { font-family: 'DM Mono', monospace; color: var(--red); }
+.memo { background: var(--surface2); border-radius: 8px; padding: 12px 14px; font-size: 13px; line-height: 1.7; margin-top: 8px; }
+.memo-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+.error-box { background: #FFE0E0; border-radius: 8px; padding: 14px; font-size: 13px; color: var(--red); margin-bottom: 12px; line-height: 1.6; }
+.settings { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 16px; border: 1px solid var(--border); }
+.settings-title { font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+.settings label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; }
+.settings input { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'DM Mono', monospace; background: var(--surface2); color: var(--text); margin-bottom: 12px; }
+.save-btn { padding: 10px 20px; background: var(--text); color: var(--bg); border: none; border-radius: 8px; font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
+.note { font-size: 11px; color: var(--text3); margin-top: 8px; line-height: 1.5; }
+.refresh-btn { display: block; width: 100%; margin-top: 12px; padding: 13px; background: var(--text); color: var(--bg); border: none; border-radius: var(--radius); font-family: 'Zen Kaku Gothic New', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+.refresh-btn:hover { opacity: 0.8; }
+.settings-link { text-align: center; margin-top: 12px; font-size: 11px; color: var(--text3); cursor: pointer; }
 </style>
 </head>
 <body>
@@ -75,7 +63,6 @@
   <h1>家計ダッシュボード</h1>
   <div class="date" id="dateStr"></div>
 </div>
-
 <div id="settingsPanel" class="settings" style="display:none;">
   <div class="settings-title">Notion APIキーを入力</div>
   <label>シークレットキー（ntn_xxx...）</label>
@@ -83,7 +70,6 @@
   <button class="save-btn" onclick="saveAndLoad()">保存して読み込む</button>
   <div class="note">キーはこのブラウザにのみ保存されます。外部サーバーには送信されません。</div>
 </div>
-
 <div id="mainContent" style="display:none;">
   <div class="signal">
     <div class="lights">
@@ -96,38 +82,22 @@
       <div class="signal-sub" id="sigSub"></div>
     </div>
   </div>
-
   <div class="metrics">
     <div class="metric">
       <div class="metric-label">純資産合計</div>
       <div class="metric-value" id="mv-net">—</div>
       <div class="metric-breakdown">
-        <div class="breakdown-item">
-          <span class="breakdown-label">現金預金</span>
-          <span class="breakdown-value" id="mv-cash">—</span>
-        </div>
-        <div class="breakdown-item">
-          <span class="breakdown-label">証券</span>
-          <span class="breakdown-value" id="mv-inv2">—</span>
-        </div>
+        <div class="breakdown-item"><span class="breakdown-label">現金預金</span><span class="breakdown-value" id="mv-cash">—</span></div>
+        <div class="breakdown-item"><span class="breakdown-label">証券</span><span class="breakdown-value" id="mv-inv2">—</span></div>
       </div>
     </div>
     <div class="metric">
       <div class="metric-label">カード利用額（合計）</div>
       <div class="metric-value dn" id="mv-card">—</div>
       <div class="metric-breakdown">
-        <div class="breakdown-item">
-          <span class="breakdown-label" id="card1-label">Visa</span>
-          <span class="breakdown-value" id="mv-card1">—</span>
-        </div>
-        <div class="breakdown-item">
-          <span class="breakdown-label" id="card2-label">バンダ</span>
-          <span class="breakdown-value" id="mv-card2">—</span>
-        </div>
-        <div class="breakdown-item">
-          <span class="breakdown-label" id="card3-label">Pink</span>
-          <span class="breakdown-value" id="mv-card3">—</span>
-        </div>
+        <div class="breakdown-item"><span class="breakdown-label" id="card1-label">Visa</span><span class="breakdown-value" id="mv-card1">—</span></div>
+        <div class="breakdown-item"><span class="breakdown-label" id="card2-label">バンダ</span><span class="breakdown-value" id="mv-card2">—</span></div>
+        <div class="breakdown-item"><span class="breakdown-label" id="card3-label">Pink</span><span class="breakdown-value" id="mv-card3">—</span></div>
       </div>
     </div>
     <div class="metric">
@@ -139,19 +109,15 @@
       <div class="metric-value" id="mv-biz">—</div>
     </div>
   </div>
-
   <div id="ufj-alert"></div>
-
   <div class="card">
     <div class="memo-label">航からのひとこと</div>
     <div class="memo" id="memoText">読み込み中...</div>
   </div>
-
   <div class="card">
     <div class="card-title">今月の固定費</div>
     <div id="fixedList"></div>
   </div>
-
   <button class="refresh-btn" onclick="loadData()">最新データに更新</button>
   <div class="settings-link" onclick="showSettings()">設定を変更</div>
 </div>
@@ -201,10 +167,40 @@ function getStr(p,k){ return p[k]?.rich_text?.[0]?.plain_text??p[k]?.title?.[0]?
 function getSel(p,k){ return p[k]?.select?.name??''; }
 function fmtMan(y){ return (Math.round(y/1000)/10).toFixed(1)+'万'; }
 function fmtYen(y){ return Math.round(y).toLocaleString('ja-JP')+'円'; }
-function pct(v,mx){ return Math.min(100,Math.round(v/mx*100)); }
-function barColor(p,rev){
-  if(rev) return p>85?'#C0392B':p>65?'#E07B39':'#2D6A4F';
-  return p<30?'#C0392B':p<50?'#E07B39':'#2D6A4F';
+
+// ★ 複数行から「項目ごとに最新の入力値」を合成して返す
+function mergeLatest(rows) {
+  const fields = [
+    '生活口座', '事業用口座', '証券・投資',
+    '楽天カード(Visa)', '楽天カード(パンダ)', '楽天カード(Pink)',
+    'ひとこと'
+  ];
+  // rows は created_time 降順（新しい順）で届く
+  const merged = {};
+  for (const row of rows) {
+    const props = row.properties;
+    for (const f of fields) {
+      if (merged[f] !== undefined) continue; // すでに確定済みならスキップ
+      const val = props[f];
+      if (!val) continue;
+      // number 型
+      if (val.number !== null && val.number !== undefined) {
+        merged[f] = val.number;
+      }
+      // rich_text / title 型（ひとこと等）
+      else if (val.rich_text?.length || val.title?.length) {
+        const txt = val.rich_text?.[0]?.plain_text ?? val.title?.[0]?.plain_text ?? '';
+        if (txt) merged[f] = txt;
+      }
+    }
+    // 全フィールド確定したら打ち切り
+    if (fields.every(f => merged[f] !== undefined)) break;
+  }
+  // 未入力フィールドは 0 / '' で補完
+  for (const f of fields) {
+    if (merged[f] === undefined) merged[f] = typeof merged[f] === 'string' ? '' : 0;
+  }
+  return merged;
 }
 
 async function loadData(){
@@ -216,35 +212,31 @@ async function loadData(){
       notionQuery(DB_FIXED)
     ]);
 
-    const validRows = mainRes.results.filter(r =>
-      r.properties['生活口座']?.number || r.properties['事業用口座']?.number || r.properties['証券・投資']?.number
-    );
-    if(!validRows.length) throw new Error('家計データが空です。Notionにデータを入力してください。');
-    const p = validRows[0].properties;
+    if(!mainRes.results.length) throw new Error('家計データが空です。Notionにデータを入力してください。');
 
-    const bank    = getNum(p,'生活口座');
-    const biz     = getNum(p,'事業用口座');
-    const inv     = getNum(p,'証券・投資');
-    const card1   = getNum(p,'楽天カード(Visa)');
-    const card2   = getNum(p,'楽天カード(パンダ)');
-    const card3   = getNum(p,'楽天カード(Pink)');
-    const card    = card1+card2+card3;
-    const memo    = getStr(p,'ひとこと');
-    const bankName= '三菱UFJ';
-    const bizName = '豊橋信用金庫';
-    const net     = bank+biz+inv-card;
+    // ★ 全行をマージして最新値を合成
+    const v = mergeLatest(mainRes.results);
 
-    document.getElementById('mv-net').textContent   = fmtMan(net)+'円';
-    document.getElementById('mv-cash').textContent  = fmtMan(bank+biz)+'円';
-    document.getElementById('mv-inv2').textContent  = fmtMan(inv)+'円';
-    
-    
-    document.getElementById('mv-card').textContent  = fmtMan(card)+'円';
-    document.getElementById('mv-bank').textContent  = fmtMan(bank)+'円';
-    document.getElementById('mv-biz').textContent   = fmtMan(biz)+'円';
-    document.getElementById('mv-card1').textContent = fmtMan(card1)+'円';
-    document.getElementById('mv-card2').textContent = fmtMan(card2)+'円';
-    document.getElementById('mv-card3').textContent = fmtMan(card3)+'円';
+    const bank  = v['生活口座']         || 0;
+    const biz   = v['事業用口座']        || 0;
+    const inv   = v['証券・投資']        || 0;
+    const card1 = v['楽天カード(Visa)']  || 0;
+    const card2 = v['楽天カード(パンダ)'] || 0;
+    const card3 = v['楽天カード(Pink)']  || 0;
+    const card  = card1+card2+card3;
+    const memo  = v['ひとこと'] || '';
+
+    const net = bank+biz+inv-card;
+
+    document.getElementById('mv-net').textContent  = fmtMan(net)+'円';
+    document.getElementById('mv-cash').textContent = fmtMan(bank+biz)+'円';
+    document.getElementById('mv-inv2').textContent = fmtMan(inv)+'円';
+    document.getElementById('mv-card').textContent = fmtMan(card)+'円';
+    document.getElementById('mv-bank').textContent = fmtMan(bank)+'円';
+    document.getElementById('mv-biz').textContent  = fmtMan(biz)+'円';
+    document.getElementById('mv-card1').textContent= fmtMan(card1)+'円';
+    document.getElementById('mv-card2').textContent= fmtMan(card2)+'円';
+    document.getElementById('mv-card3').textContent= fmtMan(card3)+'円';
     document.getElementById('card1-label').textContent = 'Visa';
     document.getElementById('card2-label').textContent = 'パンダ';
     document.getElementById('card3-label').textContent = 'Pink';
@@ -257,46 +249,41 @@ async function loadData(){
       if(hRes.ok){ const hData = await hRes.json(); holidays = new Set(Object.keys(hData)); }
     } catch(e){}
 
-    const today = new Date();
+    const today  = new Date();
     const todayY = today.getFullYear();
     const todayM = today.getMonth();
     const todayD = today.getDate();
     const todayDate = new Date(todayY, todayM, todayD);
 
-    // 実際の引き落とし日を計算（土日祝→前の平日）
     function actualDebitDate(year, month, day){
       const lastDay = new Date(year, month+1, 0).getDate();
-      const d = day===31 ? lastDay : Math.min(day, lastDay);
-      let dt = new Date(year, month, d);
-      while(dt.getDay()===0 || dt.getDay()===6 ||
-            holidays.has(dt.toISOString().slice(0,10))){
+      const dd = day===31 ? lastDay : Math.min(day, lastDay);
+      let dt = new Date(year, month, dd);
+      while(dt.getDay()===0 || dt.getDay()===6 || holidays.has(dt.toISOString().slice(0,10))){
         dt.setDate(dt.getDate()-1);
       }
       return dt;
     }
 
-    // UFJ必要残高の計算
     const fixedItems = fixedRes.results.map(r=>({
       name:   getStr(r.properties,'項目名'),
       amount: getNum(r.properties,'金額'),
       kind:   getSel(r.properties,'種別'),
       memo:   getStr(r.properties,'メモ'),
-      bank:   ((r.properties['引き落とし口座']?.multi_select?.[0]?.name) || ''),
+      bank:   (r.properties['引き落とし口座']?.multi_select?.[0]?.name) || '',
       day:    getNum(r.properties,'引き落とし日'),
     }));
 
-    // 各固定費の引き落とし済み判定
     fixedItems.forEach(item => {
       const ad = actualDebitDate(todayY, todayM, item.day||1);
       item.actualDay = ad.getDate();
-      item.debited = ad <= todayDate;
+      item.debited   = ad <= todayDate;
     });
 
     const fixedTotal = fixedItems.reduce((s,i)=>s+i.amount,0);
 
-    // カード（Visa・パンダ）の引き落とし日は27日として判定
-    const cardDebitDate = actualDebitDate(todayY, todayM, 27);
-    const cardsDebited = cardDebitDate <= todayDate;
+    const cardDebitDate  = actualDebitDate(todayY, todayM, 27);
+    const cardsDebited   = cardDebitDate <= todayDate;
 
     const ufjFixedRemaining = fixedItems
       .filter(i=>i.bank==='UFJ' && !i.debited)
@@ -304,7 +291,6 @@ async function loadData(){
     const ufjCardRemaining = cardsDebited ? 0 : (card1+card2);
     const ufjNeeded  = ufjFixedRemaining + ufjCardRemaining;
     const ufjMargin  = bank - ufjNeeded;
-    const ufjFixed   = fixedItems.filter(i=>i.bank==='UFJ').reduce((s,i)=>s+i.amount,0);
 
     const mm = todayM+1;
     let alertHtml='';
@@ -318,22 +304,22 @@ async function loadData(){
       alertHtml=`<div class="alert-box alert-green"><div class="alert-label">UFJ 残高OK</div>残り引き落とし ${fmtMan(ufjNeeded)}円 を差し引いても ${fmtMan(ufjMargin)}円 の余裕があります</div>`;
     }
     document.getElementById('ufj-alert').innerHTML=alertHtml;
-
     document.getElementById('memoText').textContent = memo||'（メッセージなし）';
 
-    const bankGroups = ['UFJ','豊橋信用金庫','豊橋信金'];
-    const ufj  = fixedItems.filter(i=>i.bank==='UFJ');
+    const ufj     = fixedItems.filter(i=>i.bank==='UFJ');
     const shinkin = fixedItems.filter(i=>i.bank==='豊橋信用金庫'||i.bank==='豊橋信金');
-    const other = fixedItems.filter(i=>i.bank!=='UFJ'&&i.bank!=='豊橋信用金庫'&&i.bank!=='豊橋信金');
-    const ufjTotal = ufj.reduce((s,i)=>s+i.amount,0);
+    const other   = fixedItems.filter(i=>i.bank!=='UFJ'&&i.bank!=='豊橋信用金庫'&&i.bank!=='豊橋信金');
+    const ufjTotal     = ufj.reduce((s,i)=>s+i.amount,0);
     const shinkinTotal = shinkin.reduce((s,i)=>s+i.amount,0);
-    const otherTotal = other.reduce((s,i)=>s+i.amount,0);
+    const otherTotal   = other.reduce((s,i)=>s+i.amount,0);
 
     const renderRows = arr => arr.map(i=>`
       <div class="fixed-row" style="${i.debited ? 'opacity:0.45;' : ''}">
         <div>
           ${i.name}${i.kind ? `<span class="fixed-badge">${i.kind}</span>` : ''}
-          ${i.debited ? `<span class="fixed-badge" style="background:#D8F3DC;color:#1B4332;">済</span>` : `<span class="fixed-badge" style="background:#FFF3CD;color:#7D4E00;">${i.actualDay}日</span>`}
+          ${i.debited
+            ? `<span class="fixed-badge" style="background:#D8F3DC;color:#1B4332;">済</span>`
+            : `<span class="fixed-badge" style="background:#FFF3CD;color:#7D4E00;">${i.actualDay}日</span>`}
           ${i.memo ? `<div class="fixed-memo">${i.memo}</div>` : ''}
         </div>
         <div class="fixed-amount">${fmtYen(i.amount)}</div>
@@ -372,7 +358,7 @@ async function loadData(){
     document.getElementById('sigSub').textContent=msgs[status][1];
 
   } catch(e){
-    document.getElementById('meters-container').innerHTML=
+    document.getElementById('ufj-alert').innerHTML=
       `<div class="error-box">読み込み失敗: ${e.message}</div>`;
     document.getElementById('sigMain').textContent='エラー';
   }
