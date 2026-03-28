@@ -168,37 +168,47 @@ function getSel(p,k){ return p[k]?.select?.name??''; }
 function fmtMan(y){ return (Math.round(y/1000)/10).toFixed(1)+'万'; }
 function fmtYen(y){ return Math.round(y).toLocaleString('ja-JP')+'円'; }
 
+// ★ タイトル（名前）から日付を解析してソート → 新しい順
+// 「2026年3月27日」のような形式に対応
+function titleToDate(row) {
+  const title = row.properties['名前']?.title?.[0]?.plain_text || '';
+  // 「YYYY年M月D日」形式をパース
+  const m = title.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
+  if (m) return new Date(parseInt(m[1]), parseInt(m[2])-1, parseInt(m[3])).getTime();
+  // 「YYYY年M月」形式もパース（日付なしは月初扱い）
+  const m2 = title.match(/(\d{4})年(\d{1,2})月/);
+  if (m2) return new Date(parseInt(m2[1]), parseInt(m2[2])-1, 1).getTime();
+  return 0;
+}
+
 // ★ 複数行から「項目ごとに最新の入力値」を合成して返す
 function mergeLatest(rows) {
+  // タイトルの日付で降順ソート（新しい順）
+  const sorted = [...rows].sort((a, b) => titleToDate(b) - titleToDate(a));
+
   const fields = [
     '生活口座', '事業用口座', '証券・投資',
     '楽天カード(Visa)', '楽天カード(パンダ)', '楽天カード(Pink)',
     'ひとこと'
   ];
-  // rows は created_time 降順（新しい順）で届く
   const merged = {};
-  for (const row of rows) {
+  for (const row of sorted) {
     const props = row.properties;
     for (const f of fields) {
-      if (merged[f] !== undefined) continue; // すでに確定済みならスキップ
+      if (merged[f] !== undefined) continue;
       const val = props[f];
       if (!val) continue;
-      // number 型
       if (val.number !== null && val.number !== undefined) {
         merged[f] = val.number;
-      }
-      // rich_text / title 型（ひとこと等）
-      else if (val.rich_text?.length || val.title?.length) {
+      } else if (val.rich_text?.length || val.title?.length) {
         const txt = val.rich_text?.[0]?.plain_text ?? val.title?.[0]?.plain_text ?? '';
         if (txt) merged[f] = txt;
       }
     }
-    // 全フィールド確定したら打ち切り
     if (fields.every(f => merged[f] !== undefined)) break;
   }
-  // 未入力フィールドは 0 / '' で補完
   for (const f of fields) {
-    if (merged[f] === undefined) merged[f] = typeof merged[f] === 'string' ? '' : 0;
+    if (merged[f] === undefined) merged[f] = 0;
   }
   return merged;
 }
@@ -214,7 +224,6 @@ async function loadData(){
 
     if(!mainRes.results.length) throw new Error('家計データが空です。Notionにデータを入力してください。');
 
-    // ★ 全行をマージして最新値を合成
     const v = mergeLatest(mainRes.results);
 
     const bank  = v['生活口座']         || 0;
@@ -225,8 +234,7 @@ async function loadData(){
     const card3 = v['楽天カード(Pink)']  || 0;
     const card  = card1+card2+card3;
     const memo  = v['ひとこと'] || '';
-
-    const net = bank+biz+inv-card;
+    const net   = bank+biz+inv-card;
 
     document.getElementById('mv-net').textContent  = fmtMan(net)+'円';
     document.getElementById('mv-cash').textContent = fmtMan(bank+biz)+'円';
@@ -241,7 +249,6 @@ async function loadData(){
     document.getElementById('card2-label').textContent = 'パンダ';
     document.getElementById('card3-label').textContent = 'Pink';
 
-    // 祝日取得
     let holidays = new Set();
     try {
       const yr = new Date().getFullYear();
@@ -281,7 +288,6 @@ async function loadData(){
     });
 
     const fixedTotal = fixedItems.reduce((s,i)=>s+i.amount,0);
-
     const cardDebitDate  = actualDebitDate(todayY, todayM, 27);
     const cardsDebited   = cardDebitDate <= todayDate;
 
