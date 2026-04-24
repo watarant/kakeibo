@@ -96,7 +96,7 @@ body { font-family: 'Zen Kaku Gothic New', sans-serif; background: var(--bg); co
       <div class="metric-value dn" id="mv-card">—</div>
       <div class="metric-breakdown">
         <div class="breakdown-item"><span class="breakdown-label" id="card1-label">Visa</span><span class="breakdown-value" id="mv-card1">—</span></div>
-        <div class="breakdown-item"><span class="breakdown-label" id="card2-label">バンダ</span><span class="breakdown-value" id="mv-card2">—</span></div>
+        <div class="breakdown-item"><span class="breakdown-label" id="card2-label">パンダ</span><span class="breakdown-value" id="mv-card2">—</span></div>
         <div class="breakdown-item"><span class="breakdown-label" id="card3-label">Pink</span><span class="breakdown-value" id="mv-card3">—</span></div>
       </div>
     </div>
@@ -168,72 +168,55 @@ function getSel(p,k){ return p[k]?.select?.name??''; }
 function fmtMan(y){ return (Math.round(y/1000)/10).toFixed(1)+'万'; }
 function fmtYen(y){ return Math.round(y).toLocaleString('ja-JP')+'円'; }
 
-// ★ タイトル（名前）から日付を解析してソート → 新しい順
-// 「2026年3月27日」のような形式に対応
-function titleToDate(row) {
-  const title = row.properties['名前']?.title?.[0]?.plain_text || '';
-  // 「YYYY年M月D日」形式をパース
-  const m = title.match(/(\d{4})年(\d{1,2})月(\d{1,2})日/);
-  if (m) return new Date(parseInt(m[1]), parseInt(m[2])-1, parseInt(m[3])).getTime();
-  // 「YYYY年M月」形式もパース（日付なしは月初扱い）
-  const m2 = title.match(/(\d{4})年(\d{1,2})月/);
-  if (m2) return new Date(parseInt(m2[1]), parseInt(m2[2])-1, 1).getTime();
-  return 0;
-}
-
-// ★ 複数行から「項目ごとに最新の入力値」を合成して返す
-function mergeLatest(rows) {
-  // タイトルの日付で降順ソート（新しい順）
-  const sorted = [...rows].sort((a, b) => titleToDate(b) - titleToDate(a));
-
-  const fields = [
-    '生活口座', '事業用口座', '証券・投資',
-    '楽天カード(Visa)', '楽天カード(パンダ)', '楽天カード(Pink)',
-    'ひとこと'
-  ];
+function mergeLatest(rows){
+  const fields = ['生活口座','事業用口座','証券・投資','楽天カード(Visa)','楽天カード(パンダ)','楽天カード(Pink)','ひとこと'];
   const merged = {};
-  for (const row of sorted) {
+  for(const row of rows){
     const props = row.properties;
-    for (const f of fields) {
-      if (merged[f] !== undefined) continue;
+    for(const f of fields){
+      if(merged[f]!==undefined) continue;
       const val = props[f];
-      if (!val) continue;
-      if (val.number !== null && val.number !== undefined) {
-        merged[f] = val.number;
-      } else if (val.rich_text?.length || val.title?.length) {
-        const txt = val.rich_text?.[0]?.plain_text ?? val.title?.[0]?.plain_text ?? '';
-        if (txt) merged[f] = txt;
+      if(!val) continue;
+      if(val.number!==null && val.number!==undefined){ merged[f]=val.number; }
+      else {
+        const txt = val.rich_text?.[0]?.plain_text??val.title?.[0]?.plain_text??'';
+        if(txt) merged[f]=txt;
       }
     }
-    if (fields.every(f => merged[f] !== undefined)) break;
+    if(fields.every(f=>merged[f]!==undefined)) break;
   }
-  for (const f of fields) {
-    if (merged[f] === undefined) merged[f] = 0;
-  }
+  for(const f of fields) if(merged[f]===undefined) merged[f]=0;
   return merged;
+}
+
+// 引き落とし日計算
+// after=true のとき土日祝→次の平日、false のとき→前の平日
+function actualDebitDate(year, month, day, holidays, after){
+  const lastDay = new Date(year, month+1, 0).getDate();
+  const dd = day===31 ? lastDay : Math.min(day, lastDay);
+  let dt = new Date(year, month, dd);
+  while(dt.getDay()===0 || dt.getDay()===6 || holidays.has(dt.toISOString().slice(0,10))){
+    dt.setDate(dt.getDate() + (after ? 1 : -1));
+  }
+  return dt;
 }
 
 async function loadData(){
   document.getElementById('sigMain').textContent='読み込み中...';
   document.getElementById('sigMain').style.color='';
   try {
-    const [mainRes, fixedRes] = await Promise.all([
-      notionQuery(DB_MAIN),
-      notionQuery(DB_FIXED)
-    ]);
-
-    if(!mainRes.results.length) throw new Error('家計データが空です。Notionにデータを入力してください。');
+    const [mainRes, fixedRes] = await Promise.all([notionQuery(DB_MAIN), notionQuery(DB_FIXED)]);
+    if(!mainRes.results.length) throw new Error('家計データが空です。');
 
     const v = mergeLatest(mainRes.results);
-
-    const bank  = v['生活口座']         || 0;
-    const biz   = v['事業用口座']        || 0;
-    const inv   = v['証券・投資']        || 0;
-    const card1 = v['楽天カード(Visa)']  || 0;
-    const card2 = v['楽天カード(パンダ)'] || 0;
-    const card3 = v['楽天カード(Pink)']  || 0;
+    const bank  = v['生活口座']||0;
+    const biz   = v['事業用口座']||0;
+    const inv   = v['証券・投資']||0;
+    const card1 = v['楽天カード(Visa)']||0;
+    const card2 = v['楽天カード(パンダ)']||0;
+    const card3 = v['楽天カード(Pink)']||0;
     const card  = card1+card2+card3;
-    const memo  = v['ひとこと'] || '';
+    const memo  = v['ひとこと']||'';
     const net   = bank+biz+inv-card;
 
     document.getElementById('mv-net').textContent  = fmtMan(net)+'円';
@@ -245,10 +228,8 @@ async function loadData(){
     document.getElementById('mv-card1').textContent= fmtMan(card1)+'円';
     document.getElementById('mv-card2').textContent= fmtMan(card2)+'円';
     document.getElementById('mv-card3').textContent= fmtMan(card3)+'円';
-    document.getElementById('card1-label').textContent = 'Visa';
-    document.getElementById('card2-label').textContent = 'パンダ';
-    document.getElementById('card3-label').textContent = 'Pink';
 
+    // 祝日取得
     let holidays = new Set();
     try {
       const yr = new Date().getFullYear();
@@ -256,47 +237,38 @@ async function loadData(){
       if(hRes.ok){ const hData = await hRes.json(); holidays = new Set(Object.keys(hData)); }
     } catch(e){}
 
-    const today  = new Date();
+    const today = new Date();
     const todayY = today.getFullYear();
     const todayM = today.getMonth();
-    const todayD = today.getDate();
-    const todayDate = new Date(todayY, todayM, todayD);
-
-    function actualDebitDate(year, month, day){
-      const lastDay = new Date(year, month+1, 0).getDate();
-      const dd = day===31 ? lastDay : Math.min(day, lastDay);
-      let dt = new Date(year, month, dd);
-      while(dt.getDay()===0 || dt.getDay()===6 || holidays.has(dt.toISOString().slice(0,10))){
-        dt.setDate(dt.getDate()-1);
-      }
-      return dt;
-    }
+    const todayDate = new Date(todayY, todayM, today.getDate());
 
     const fixedItems = fixedRes.results.map(r=>({
       name:   getStr(r.properties,'項目名'),
       amount: getNum(r.properties,'金額'),
       kind:   getSel(r.properties,'種別'),
       memo:   getStr(r.properties,'メモ'),
-      bank:   (r.properties['引き落とし口座']?.multi_select?.[0]?.name) || '',
+      bank:   (r.properties['引き落とし口座']?.multi_select?.[0]?.name)||'',
       day:    getNum(r.properties,'引き落とし日'),
     }));
 
     fixedItems.forEach(item => {
-      const ad = actualDebitDate(todayY, todayM, item.day||1);
+      // 25日のみ後倒し、それ以外は前倒し
+      const after = item.day===25;
+      const ad = actualDebitDate(todayY, todayM, item.day||1, holidays, after);
       item.actualDay = ad.getDate();
       item.debited   = ad <= todayDate;
     });
 
     const fixedTotal = fixedItems.reduce((s,i)=>s+i.amount,0);
-    const cardDebitDate  = actualDebitDate(todayY, todayM, 27);
-    const cardsDebited   = cardDebitDate <= todayDate;
 
-    const ufjFixedRemaining = fixedItems
-      .filter(i=>i.bank==='UFJ' && !i.debited)
-      .reduce((s,i)=>s+i.amount, 0);
-    const ufjCardRemaining = cardsDebited ? 0 : (card1+card2);
-    const ufjNeeded  = ufjFixedRemaining + ufjCardRemaining;
-    const ufjMargin  = bank - ufjNeeded;
+    // カード（Visa・パンダ）は27日引き落とし・前倒し
+    const cardDebitDate = actualDebitDate(todayY, todayM, 27, holidays, false);
+    const cardsDebited  = cardDebitDate <= todayDate;
+
+    const ufjFixedRemaining = fixedItems.filter(i=>i.bank==='UFJ'&&!i.debited).reduce((s,i)=>s+i.amount,0);
+    const ufjCardRemaining  = cardsDebited ? 0 : (card1+card2);
+    const ufjNeeded = ufjFixedRemaining + ufjCardRemaining;
+    const ufjMargin = bank - ufjNeeded;
 
     const mm = todayM+1;
     let alertHtml='';
@@ -310,7 +282,7 @@ async function loadData(){
       alertHtml=`<div class="alert-box alert-green"><div class="alert-label">UFJ 残高OK</div>残り引き落とし ${fmtMan(ufjNeeded)}円 を差し引いても ${fmtMan(ufjMargin)}円 の余裕があります</div>`;
     }
     document.getElementById('ufj-alert').innerHTML=alertHtml;
-    document.getElementById('memoText').textContent = memo||'（メッセージなし）';
+    document.getElementById('memoText').textContent=memo||'（メッセージなし）';
 
     const ufj     = fixedItems.filter(i=>i.bank==='UFJ');
     const shinkin = fixedItems.filter(i=>i.bank==='豊橋信用金庫'||i.bank==='豊橋信金');
@@ -320,30 +292,30 @@ async function loadData(){
     const otherTotal   = other.reduce((s,i)=>s+i.amount,0);
 
     const renderRows = arr => arr.map(i=>`
-      <div class="fixed-row" style="${i.debited ? 'opacity:0.45;' : ''}">
+      <div class="fixed-row" style="${i.debited?'opacity:0.45;':''}">
         <div>
-          ${i.name}${i.kind ? `<span class="fixed-badge">${i.kind}</span>` : ''}
+          ${i.name}${i.kind?`<span class="fixed-badge">${i.kind}</span>`:''}
           ${i.debited
-            ? `<span class="fixed-badge" style="background:#D8F3DC;color:#1B4332;">済</span>`
-            : `<span class="fixed-badge" style="background:#FFF3CD;color:#7D4E00;">${i.actualDay}日</span>`}
-          ${i.memo ? `<div class="fixed-memo">${i.memo}</div>` : ''}
+            ?`<span class="fixed-badge" style="background:#D8F3DC;color:#1B4332;">済</span>`
+            :`<span class="fixed-badge" style="background:#FFF3CD;color:#7D4E00;">${i.actualDay}日</span>`}
+          ${i.memo?`<div class="fixed-memo">${i.memo}</div>`:''}
         </div>
         <div class="fixed-amount">${fmtYen(i.amount)}</div>
       </div>`).join('');
 
-    const renderSubtotal = (label, amt) =>
+    const renderSubtotal = (label,amt) =>
       `<div style="display:flex;justify-content:space-between;padding:7px 0;font-size:12px;font-weight:700;color:var(--text2);border-top:0.5px solid var(--border);margin-top:2px;margin-bottom:10px;">
         <span>${label} 小計</span><span style="font-family:'DM Mono',monospace;">${fmtYen(amt)}</span>
       </div>`;
 
-    const renderGroup = (label, arr, total) => arr.length===0 ? '' :
-      `<div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">${label}</div>`+
-      renderRows(arr)+renderSubtotal(label, total);
+    const renderGroup = (label,arr,total) => arr.length===0?'':
+      `<div style="font-size:10px;font-weight:700;color:var(--text3);letter-spacing:0.08em;margin-bottom:6px;">${label}</div>`+
+      renderRows(arr)+renderSubtotal(label,total);
 
-    document.getElementById('fixedList').innerHTML =
-      renderGroup('UFJ', ufj, ufjTotal)+
-      renderGroup('豊橋信用金庫', shinkin, shinkinTotal)+
-      (other.length ? renderGroup('その他', other, otherTotal) : '')+
+    document.getElementById('fixedList').innerHTML=
+      renderGroup('UFJ',ufj,ufjTotal)+
+      renderGroup('豊橋信用金庫',shinkin,shinkinTotal)+
+      (other.length?renderGroup('その他',other,otherTotal):'')+
       `<div class="fixed-total"><span>月合計</span><span class="fixed-total-val">${fmtYen(fixedTotal)}</span></div>`;
 
     let status='green';
@@ -364,8 +336,7 @@ async function loadData(){
     document.getElementById('sigSub').textContent=msgs[status][1];
 
   } catch(e){
-    document.getElementById('ufj-alert').innerHTML=
-      `<div class="error-box">読み込み失敗: ${e.message}</div>`;
+    document.getElementById('ufj-alert').innerHTML=`<div class="error-box">読み込み失敗: ${e.message}</div>`;
     document.getElementById('sigMain').textContent='エラー';
   }
 }
